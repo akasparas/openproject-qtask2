@@ -1,0 +1,12 @@
+/*
+  Place all the styles related to the matching controller here.
+  They will automatically be included in application.css.
+*/
+
+.qtask-main-internal .work-package--attachments--drop-box {
+    display: none;
+}
+
+.qtask-main-internal  button#work-packages--edit-actions-cancel {
+    display: none;
+}

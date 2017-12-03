@@ -1,0 +1,12 @@
+{
+  "name": "openproject-qtask2",
+  "version": "0.1.1",
+  "description": "OpenProject QuickTask Plugin",
+  "main": "frontend/app/openproject-quicktask-app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aidas Kasparas <a.kasparas@gmc.lt> (https://www.gmc.lt)",
+  "license": "GPLv3",
+  "dependencies": {}
+}

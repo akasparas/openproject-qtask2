@@ -1,0 +1,35 @@
+<%= stylesheet_link_tag 'qtask', plugin: :openproject_qtask2 %>
+<% html_title(t(:label_qtasks)) -%>
+
+
+<h1><%= t(:label_qtasks) %></h1>
+
+<p>
+  <div qtask-main>
+    <div class="qtask-main-internal" ng-if="projects.available">
+
+        <form qtask-form="1">
+          <div class="attributes-key-value">
+            <div class="attributes-key-value--key">Project: </div>
+            <div class="attributes-key-value--value-container">
+              <select name="mySelect" id="mySelect"
+                ng-options="option.name for option in projects.available | orderBy:'name' track by option.id"
+                ng-model="projects.selected" ng-change="$ctrl.onProjectChange()"></select>
+            </div>
+          </div>
+        </form>
+
+      <wp-edit-field-group work-package="$ctrl.workPackage"
+                     success-state="$ctrl.successState"
+                     in-edit-mode="true"
+                     ng-if="$ctrl.workPackage">
+        <wp-type-status work-package="$ctrl.workPackage"></wp-type-status>
+          <wp-single-view work-package="$ctrl.workPackage"></wp-single-view>
+          <edit-actions-barr
+               on-save="$ctrl.onSave()"
+               on-cancel="$ctrl.cancelAndBackToList()"
+           ></edit-actions-barr>
+      </wp-edit-field-group>
+    </div>
+  </div>
+</p>

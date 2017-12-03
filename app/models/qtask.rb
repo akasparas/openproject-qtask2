@@ -1,0 +1,2 @@
+class Qtask < ApplicationRecord
+end
