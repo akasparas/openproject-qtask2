@@ -10,7 +10,7 @@ module OpenProject::Qtask2
 
     register( 'openproject-qtask2',
              :author_url => 'https://openproject.org',
-             :requires_openproject => '>= 7.3.0'
+             :requires_openproject => '>= 7.4.0'
     ) do
 
       project_module :qtask_module do

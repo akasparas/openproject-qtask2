@@ -10,3 +10,15 @@
 .qtask-main-internal  button#work-packages--edit-actions-cancel {
     display: none;
 }
+
+.qtask-main-internal div[data-group-name="hidden"] {
+    display: none;
+}
+
+div[data-group-name="hidden"].attributes-group {
+    display: none;    
+}
+
+.qtask-main-internal .wp-inline-edit--active-field.subject {
+    display: none;
+}

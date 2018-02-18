@@ -36,6 +36,8 @@ class QtaskController < ApplicationController
     end
   end
 
+  public 
+
   def index
     respond_to do |format|
       format.html do
@@ -54,6 +56,12 @@ class QtaskController < ApplicationController
     end
   end
 
+  def new
+  end
+
+  def create 
+  end
+  
   # current_menu_item :index do
   #  :work_packages
   # end

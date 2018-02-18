@@ -52,9 +52,6 @@ export class qtaskMainController {
   public me:HalResource;
 
   constructor(private $scope:ng.IScope,
-              public $element:ng.IAugmentedJQuery,
-              $rootScope:ng.IRootScopeService,
-              //states:States,
               protected $q:ng.IQService,
               protected $http:ng.IHttpService,
               protected $httpParamSerializerJQLike:ng.IHttpParamSerializerJQLikeService,
@@ -68,12 +65,6 @@ export class qtaskMainController {
               protected RootDm:RootDmService,
               protected currentProject:CurrentProjectService
 
-                // private typeResource:TypeResource
-
-//              wpTableGroupBy:WorkPackageTableGroupByService,
-//              wpTableTimeline:WorkPackageTableTimelineService,
-//              wpTableColumns:WorkPackageTableColumnsService,
-//              wpResizer:WorkPackageResizerService
               ) {
 
     this.RootDm.load().then((root:RootResource) => {
@@ -106,19 +97,19 @@ export class qtaskMainController {
   protected newWorkPackageFromParams(stateParams:any) {
     const type = parseInt(stateParams.type);
 
-    // If there is an open edit for this type, continue it
-    const changeset = this.wpEditing.state('new').value;
-    if (changeset !== undefined) {
-      const changeType = changeset.workPackage.type;
+    // // If there is an open edit for this type, continue it
+    // const changeset = this.wpEditing.state('new').value;
+    // if (changeset !== undefined) {
+    //   const changeType = changeset.workPackage.type;
 
-      const hasChanges = !changeset.empty;
-      const typeEmpty = (!changeType && !type);
-      const typeMatches = (changeType && changeType.idFromLink === type.toString());
+    //   const hasChanges = !changeset.empty;
+    //   const typeEmpty = (!changeType && !type);
+    //   const typeMatches = (changeType && changeType.idFromLink === type.toString());
 
-      if (hasChanges && (typeEmpty || typeMatches)) {
-        return this.$q.when(changeset);
-      }
-    }
+    //   if (hasChanges && (typeEmpty || typeMatches)) {
+    //     return this.$q.when(changeset);
+    //   }
+    // }
 
     return this.wpCreate.createNewTypedWorkPackage(stateParams.projectPath, type);
   }
@@ -131,6 +122,8 @@ export class qtaskMainController {
   // }
 
   public onSave(){
+    if (this.workPackage.spent_saved) return;
+    this.workPackage.spent_saved = 1;
     this.$http({
       //url: '/projects/medo-project/time_entries',
       url: '/work_packages/' + this.workPackage.id + '/time_entries',
@@ -156,6 +149,8 @@ export class qtaskMainController {
 
   public onProjectChange() {
     console.log('vykdau onProjectChange()');
+    this.$scope.changeset = null;
+    this.workPackage = null;
     if (this.$scope.projects.selected) {
       console.log('Will be createing in project ' + this.$scope.projects.selected.identifier);
       this.$scope.form = this.apiWorkPackages.emptyCreateForm('', this.$scope.projects.selected.identifier);
@@ -180,7 +175,6 @@ export class qtaskMainController {
           }
 
         }
-      });
 
       var currentDate = new Date().toISOString().substring(0,10);
       this.newWorkPackageFromParams({projectPath: this.$scope.projects.selected.identifier}) // , type: $scope.selectedType.id })
@@ -188,33 +182,40 @@ export class qtaskMainController {
           var initValues = {
             status: this.$scope.selectedStatus,
             type: this.$scope.selectedType,
-            // subject: 'Test subject',
+            subject: this.$scope.projects.selected.name, // 'Test subject',
             // description: {format: 'textile', raw: 'Test _des_ *cri* -ption- ...', html: 'Test <i>des</i><b>crip</b><strike>ption</strike>...'},
             startDate: currentDate,
             dueDate: currentDate,
             estimatedTime: 'PT0.25H',
-            responsible: this.me, //{ href: '/api/v3/users/1', title: 'Aš pats'},
-            assignee: this.me //{ href: '/api/v3/users/1', title: 'Aš pats'}
+            responsible: this.me,
+            assignee: this.me
           };
+          // console.log(this.me);
+          // console.log({t: 'me', href: this.me.href, title: this.me.name, w: this.me});
 
           this.$scope.changeset = changeset;
           this.workPackage = changeset.workPackage;
           for (let key in initValues) {
             if (!initValues[key]) continue; //
             this.$scope.changeset.setValue(key, initValues[key]);
-            if (typeof initValues[key] === 'object' && 'href' in initValues[key]){
-              this.workPackage.$source._links[key]=initValues[key];
+            if (typeof initValues[key] === 'object' && 'href' in initValues[key] && key in changeset.workPackage.$links){
+              // console.log(changeset.workPackage);
+              changeset.workPackage.$links[key]=initValues[key];
               if ('name' in initValues[key] || 'title' in initValues[key]) {
-                this.workPackage[key]=initValues[key];
+                changeset.workPackage[key]=initValues[key];
+                // console.log({a: 'set by name', k: key, v: initValues[key]});
               }
             } else {
-              this.workPackage[key]=initValues[key];
+              changeset.workPackage[key]=initValues[key];
             }
           };
-          delete this.workPackage.addAttachments;
+          delete changeset.workPackage.addAttachments;
+          // console.log(changeset.workPackage);
 
           this.wpEditing.updateValue('new', changeset);
+          this.workPackage = changeset.workPackage;
           this.wpCacheService.updateWorkPackage(changeset.workPackage);
+          //this.wpCacheService.updateWorkPackage(this.workPackage);
         })
         .catch(error => {
           if (error.errorIdentifier === 'urn:openproject-org:api:v3:errors:MissingPermission') {
@@ -230,6 +231,7 @@ export class qtaskMainController {
             this.wpNotificationsService.handleErrorResponse(error);
           }
         });
+      });
     }
   }
 
